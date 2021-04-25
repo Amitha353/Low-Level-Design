@@ -1,4 +1,3 @@
-* Car Rental
 * Facebook
 * LinkedIn
 * RestAPI Unix
