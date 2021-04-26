@@ -1,0 +1,243 @@
+Amazon Locker:
+
+Create these objects: Locker, Location, Package, User, Order, Shipment
+
+1. Amazon warehouse packages Orders into a Shipment with one or more Packages.
+2. Insert created Package(s) into a database and associate them with a Shipment. Associate Shipment with Order, Associate Order with User.
+3. Guarantee that the length, width, and height of each Package cannot exceed the largest Locker's length, width, and height.
+4. (Closest Locker Problem) Find closest Location of lockers to the Package's destination Location. Check that the Location has a volume of Locker spaces greater than or equal to the Package volume (we only need to check volume because step 3 constrains the dimensions). If not, find second closest Locker Location, and so on and so forth.
+5. (Fitting Problem) Lockers have a set number of sizes (say small, medium, and large). Now, design an algorithm to fit Packages volume into Locker volume, so that minimum amount of Lockers are used. This is easily imagined as a recursive algorithm where you continuously solve for the remaining Packages until the Packages are all fit into Lockers. Each time you fit a package, you return a list of available boxes (remaining spaces in the locker in terms of boxes for that single Locker). If there are no boxes that fit the remaining packages, look for another Locker for the rest of the packages. This method will return the list of Lockers used for the Shipment.
+6. Once we know the Packages can be stored at a Locker Location, return the used Locker's Locker IDs and Password to the user (delivery person, recipient, etc).
+----------------------
+class User {
+	String fullname;
+	String username;
+	String password;
+	String email;
+	Address address;
+	String phoneNo;
+	String email;
+	
+	public boolean authenticateUSer(User user) {}
+	
+	public boolean resetPassword() {}
+}
+
+class OrderItem {
+	int orderId;
+	String orderName;
+	float orderQuantity;
+	float orderPrice;
+	float tax;
+	float cost;
+}
+
+class Order {
+	User user;
+	List<OrderItem> items;
+	float totalCost;
+	
+	public List<OrderItems> getUpdatedOrders(List<OrderItem> temp) {
+		temp.cost = temp.orderQuantity * temp.orderPrice + tax;
+		items.add(temp);
+	}
+}
+
+class Package {
+	int packageId;
+	List<OrderItems> packageItems;
+	String packageSize;
+}
+
+class Delivery {
+	int deliveryId;
+	int identifier;
+	Address address;
+	Status status;
+	List<Locker> parcels;
+	int pin;
+	
+	
+	public List<Locker> addLockerPin(List<Locker> parcels) {
+		int pin = 
+		for(Locker locker: parcels) {
+			locker.pin = pin; 
+		}
+		return parcels;
+	}
+}
+
+class Shipment {
+	int shipmentId;
+	Order order;
+	List<Package> packages;
+	User user;
+	Delivery means;
+	
+	public List<Package> buildShipment(Order order,List<Package> packages) {
+		user = order.user;
+		List<OrderItems> items = order.getUpdatedOrders();
+		for(int i = 0; i < items.size(); i += 5) {
+			Package p = new Package();
+			p.packageItems = items.subList(i, i+5);
+			packages.add(p);
+		}
+		return packages;
+	}
+}
+
+class Locker {
+	int lockId;
+	int pin;
+	int parcelId;
+	String size;
+	Address location;
+	
+	public boolean isFull() {
+		if(size < SIZE.S) {
+			return true;
+		}
+		return false;
+	}
+}
+
+class LocationMapper {
+	// get all lockers near the location
+	
+	public List<Lockers> getNearbyLockers(User start, Delivery end){
+		List<Locker> lockers = api.extractLocker(start.zipcode, end.zipcode, start.city);
+	}
+}
+
+class LockerMapper {
+	//User user;
+	//Shipment shipment;
+	//LocationMapper lmapper;
+	//List<Locker> lockers = lmapper.getNearbyLockers(user, shipment.delivery);
+	// filter - selectively - use of predicates
+
+	public List<Locker> getFilledLockers(List<Locker> selectedLockers, Shipment shipment) {
+		Set<Locker> result = new ArrayList<>();
+		List<Package> packages = shipment.package;
+		for(Package package: packages) {
+			Locker item = filterLockers(selectedLockers, isSize("L"))[0];
+			if(package.size.equals("S")) {
+				item = filterLockers(selectedLockers, isSize("S"))[0];
+			} else if(package.size.equals("M")) {
+				item = filterLockers(selectedLockers, isSize("M"))[0];
+			} else if(package.size.equals("L")) {
+				item = filterLockers(selectedLockers, isSize("L"))[0];
+			} else if(package.size.equals("XL")) {
+				item = filterLockers(selectedLockers, isSize("XL"))[0];
+			}
+			item.pid = package.id;
+			result.add(item);
+			if(item.isFull())
+				selectedLockers.remove(item);
+		}
+		return result;
+	}
+}
+
+class LockerPredicate { //Open-Close Principle
+	public static Predicate<Locker> isSize(String size) {
+		return l -> l.size == size;
+	}
+	
+	public static Predicate<Locker> zipcodeMatch(String zipcode) {
+		return l -> l.address.zipcode == zipcode;
+	}
+	
+	public static List<Locker> filterLockers(List<Locker> lockers, Predicate<Locker> predicate) {
+		return lockers.stream().filter(predicate).collect(Collectors.<Locker>toList());
+	}
+}
+
+class interface INotificationStrategy {
+	public String send(String message);
+}
+
+public class IosStrategy implements INotificationStrategy {
+	User user;
+	public String send(String message) {
+		System.out.println( " message sent to " + user.phone); 
+	}
+}
+
+public class AndroidStrategy implements INotificationStrategy {
+	User user;
+	public String send(String message) {
+		System.out.println( " message sent to " + user.phone); 
+	}
+}
+
+public class EmailStrategy implements INotificationStrategy {
+	User user;
+	public String send(String message) {
+		System.out.println( " message sent to " + user.phone); 
+	}
+}
+
+public class SmsStrategy implements INotificationStrategy {
+	User user;
+	public String send(String message) {
+		System.out.println( " message sent to " + user.phone); 
+	}
+}
+
+public class NotificationMediaContext {
+	INotificationStrategy chosenStrategy;
+	
+	public void setNotificationStrategy(INotificationStrategy chosenStrategy) {
+		this.chosenStrategy = chosenStrategy;
+	}
+	
+	public void connect(String name) {
+		chosenStrategy.connectTo(name);
+	}
+}
+
+class LockerFacade {
+	User user;
+	Order order;
+	Shipment shipment;
+	LocationMapper location
+	LockerMapper lmapper;
+	List<Locker> userLockers;
+	NotificationMediaContext context;
+	
+	public LockerFacade() {
+		user = new User();
+		order = new Order(user);
+		shipment = new shipment(user, order);
+		location = new LocationMapper(user, shipment);
+		lmapper = new LockerMapper();
+		context = new NotificationMediaContext();
+	}
+	
+	public List<Locker> getUserParcelsLockers() {
+		Delivery person = shipment.delivery;
+		List<Locker> closeLockers = getNearbyLockers(user.zipcode, parcel.position, user.city);
+		List<Packages> packages = shipment.package;
+		List<Locker> userLockers = lmapper.getFilledLockers(closeLockers, packages);
+		List<Locker> userLockers = person.add(userLockers);
+		lmapper.setLockers(userLockers);
+		return;
+	}
+	
+	public void getNotification() {
+		Delivery parcel = shipment.delivery;
+		System.out.println(parcel.status);
+		//strategy pattern
+		
+		//email
+		context.setStrategy(new EmailStrategy);
+		context.connect(user.name);
+		//sms
+		context.setStrategy(new smsStrategy);
+
+		//phone
+		context.setStrategy(new IosStrategy());
+		context.setStrategy(new AndroidStrategy());
+	}
+}
